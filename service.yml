@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sample-nginx-deployment
+  labels:
+    app: sample-nginx
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: sample-nginx
+  template:
+    metadata:
+      labels:
+        app: sample-nginx
+    spec:
+      containers:
+        - name: nginx
+          image: nginx:alpine
+          ports:
+            - containerPort: 80
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "200m"
+              memory: "256Mi"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: sample-nginx-service
+spec:
+  selector:
+    app: sample-nginx
+  type: NodePort  # Change to LoadBalancer if you're on cloud
+  ports:
+    - protocol: TCP
+      port: 80        # Cluster-internal port
+      targetPort: 80  # Container port
+      nodePort: 30080 # Optional: static port, otherwise assigned automatically
